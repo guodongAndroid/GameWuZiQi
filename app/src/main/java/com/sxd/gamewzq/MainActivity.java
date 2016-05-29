@@ -26,19 +26,19 @@ public class MainActivity extends AppCompatActivity
         mWQZ.setOnGameOverLinstener(new WuZiQi.GameOverLinstener()
         {
             @Override
-            public void onGameOver(WuZiQi.Win win)
+            public void onGameOver(WuZiQi.Winner win)
             {
                 switch (win)
                 {
-                    case WHITEWIN:
+                    case WHITEWINNER:
                         showDialog("白棋胜利");
                         break;
 
-                    case BLACKWIN:
+                    case BLACKWINNER:
                         showDialog("黑棋胜利");
                         break;
 
-                    case NOWIN:
+                    case NOWINNER:
                         showDialog("和棋");
                         break;
                     default:

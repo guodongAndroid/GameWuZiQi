@@ -44,12 +44,12 @@ public class WuZiQi extends View
 
     private boolean mIsGameOver;
 
-    public enum Win
+    public enum Winner
     {
-        INIT_WIN,
-        WHITEWIN,
-        BLACKWIN,
-        NOWIN
+        INIT_WINNER,
+        WHITEWINNER,
+        BLACKWINNER,
+        NOWINNER
     }
 
     public interface GameOverLinstener
@@ -57,10 +57,10 @@ public class WuZiQi extends View
         /**
          * @param win win == true, 白棋胜, 反之则，黑棋胜
          */
-        void onGameOver(Win win);
+        void onGameOver(Winner win);
     }
 
-    private Win mWin = Win.INIT_WIN;
+    private Winner mWin = Winner.INIT_WINNER;
 
     private GameOverLinstener mGameOverLinstener;
 
@@ -139,11 +139,11 @@ public class WuZiQi extends View
         boolean noWin = checkNoWin(whiteWin, blackWin);
 
         if (whiteWin)
-            mWin = Win.WHITEWIN;
+            mWin = Winner.WHITEWINNER;
         else if (blackWin)
-            mWin = Win.BLACKWIN;
+            mWin = Winner.BLACKWINNER;
         else if (noWin)
-            mWin = Win.NOWIN;
+            mWin = Winner.NOWINNER;
 
         if (whiteWin || blackWin || noWin)
         {
@@ -362,7 +362,7 @@ public class WuZiQi extends View
         mBlackArray.clear();
         mIsGameOver = false;
         mIsWhite = true;
-        mWin = Win.INIT_WIN;
+        mWin = Winner.INIT_WINNER;
         invalidate();
     }
 
