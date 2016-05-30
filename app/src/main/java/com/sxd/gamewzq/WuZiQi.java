@@ -1,11 +1,13 @@
 package com.sxd.gamewzq;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -28,7 +30,8 @@ public class WuZiQi extends View
     private int MAX_LINE = 10;
     private int MAX_COUNT_IN_LINE = 5;
 
-    private Paint mPaint = new Paint();
+    private Paint mPaint;
+    private int mPaintColor = 0x88000000;
 
     private Bitmap mWhitePiece;
     private Bitmap mBlackPiece;
@@ -69,22 +72,66 @@ public class WuZiQi extends View
         this.mGameOverLinstener = linstener;
     }
 
-    public WuZiQi(Context context, AttributeSet attrs)
+    public WuZiQi(Context context)
     {
-        super(context, attrs);
-        setBackgroundColor(0x44FF0000);
-        init();
+        this(context, null);
     }
 
-    private void init()
+    public WuZiQi(Context context, AttributeSet attrs)
     {
-        mPaint.setColor(0x88000000);
+        this(context, attrs, 0);
+    }
+
+    public WuZiQi(Context context, AttributeSet attrs, int defStyleAttr)
+    {
+        super(context, attrs, defStyleAttr);
+        init(context, attrs);
+    }
+
+    private void init(Context context, AttributeSet attrs)
+    {
+        TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.WuZiQi);
+        int count = array.getIndexCount();
+        for (int i = 0; i < count; i++)
+        {
+            int attrName = array.getIndex(i);
+            switch (attrName)
+            {
+                // 棋盘线颜色
+                case R.styleable.WuZiQi_panel_line_color:
+                    mPaintColor = array.getInteger(attrName, 0x88000000);
+                    break;
+                // 白棋图片
+                case R.styleable.WuZiQi_white_piece_img:
+                    BitmapDrawable whitePieceBitmap = (BitmapDrawable) array.getDrawable(attrName);
+                    mWhitePiece = whitePieceBitmap.getBitmap();
+                    break;
+                // 黑棋图片
+                case R.styleable.WuZiQi_black_piece_img:
+                    BitmapDrawable blackPieceBitmap = (BitmapDrawable) array.getDrawable(attrName);
+                    mBlackPiece = blackPieceBitmap.getBitmap();
+                    break;
+                // 棋盘最大行/列数
+                case R.styleable.WuZiQi_max_count_line:
+                    MAX_LINE = array.getInteger(attrName, 10);
+                    break;
+                // 最大几子连珠胜利
+                case R.styleable.WuZiQi_max_win_count_piece:
+                    MAX_COUNT_IN_LINE = array.getInteger(attrName, 5);
+                    break;
+            }
+        }
+
+        mPaint = new Paint();
+        mPaint.setColor(mPaintColor);
         mPaint.setAntiAlias(true); // 抗锯齿
         mPaint.setDither(true); // 防抖动
         mPaint.setStyle(Paint.Style.STROKE);
 
-        mWhitePiece = BitmapFactory.decodeResource(getResources(), R.drawable.stone_w2);
-        mBlackPiece = BitmapFactory.decodeResource(getResources(), R.drawable.stone_b1);
+        if (mWhitePiece == null)
+            mWhitePiece = BitmapFactory.decodeResource(getResources(), R.drawable.stone_w2);
+        if (mBlackPiece == null)
+            mBlackPiece = BitmapFactory.decodeResource(getResources(), R.drawable.stone_b1);
     }
 
     @Override
@@ -282,13 +329,16 @@ public class WuZiQi extends View
         return false;
     }
 
-    private boolean checkNoWin(boolean whiteWin, boolean blackWin) {
-        if (whiteWin || blackWin) {
+    private boolean checkNoWin(boolean whiteWin, boolean blackWin)
+    {
+        if (whiteWin || blackWin)
+        {
             return false;
         }
         int maxPieces = MAX_LINE * MAX_LINE;
         //如果白棋和黑棋的总数等于棋盘格子数,说明和棋
-        if (mWhiteArray.size() + mBlackArray.size() == maxPieces) {
+        if (mWhiteArray.size() + mBlackArray.size() == maxPieces)
+        {
             return true;
         }
         return false;

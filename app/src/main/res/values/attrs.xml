@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <declare-styleable name="WuZiQi">
+        <attr name="panel_line_color" format="integer"/>
+        <attr name="white_piece_img" format="reference"/>
+        <attr name="black_piece_img" format="reference"/>
+        <attr name="max_count_line" format="integer"/>
+        <attr name="max_win_count_piece" format="integer"/>
+    </declare-styleable>
+    
+</resources>
