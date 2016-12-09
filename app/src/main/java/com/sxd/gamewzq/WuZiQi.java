@@ -13,6 +13,7 @@ import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 
 import java.util.ArrayList;
 
@@ -21,8 +22,7 @@ import java.util.ArrayList;
  * 时间：2016/5/29 21:01
  * 邮箱：sun33919135@gmail.com
  */
-public class WuZiQi extends View
-{
+public class WuZiQi extends View {
 
     private int mPanelWidth;
     private float mLineHeight;
@@ -36,6 +36,8 @@ public class WuZiQi extends View
     private Bitmap mWhitePiece;
     private Bitmap mBlackPiece;
 
+    private Button mRegretBtn = null; // 悔棋按钮
+
     private float ratioPieceOfLineHeight = 3 * 1.0f / 4;
 
     /**
@@ -47,16 +49,14 @@ public class WuZiQi extends View
 
     private boolean mIsGameOver;
 
-    public enum Winner
-    {
+    public enum Winner {
         INIT_WINNER,
         WHITEWINNER,
         BLACKWINNER,
         NOWINNER
     }
 
-    public interface GameOverLinstener
-    {
+    public interface GameOverLinstener {
         /**
          * @param win win == true, 白棋胜, 反之则，黑棋胜
          */
@@ -67,36 +67,29 @@ public class WuZiQi extends View
 
     private GameOverLinstener mGameOverLinstener;
 
-    public void setOnGameOverLinstener(GameOverLinstener linstener)
-    {
+    public void setOnGameOverLinstener(GameOverLinstener linstener) {
         this.mGameOverLinstener = linstener;
     }
 
-    public WuZiQi(Context context)
-    {
+    public WuZiQi(Context context) {
         this(context, null);
     }
 
-    public WuZiQi(Context context, AttributeSet attrs)
-    {
+    public WuZiQi(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public WuZiQi(Context context, AttributeSet attrs, int defStyleAttr)
-    {
+    public WuZiQi(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
     }
 
-    private void init(Context context, AttributeSet attrs)
-    {
+    private void init(Context context, AttributeSet attrs) {
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.WuZiQi);
         int count = array.getIndexCount();
-        for (int i = 0; i < count; i++)
-        {
+        for (int i = 0; i < count; i++) {
             int attrName = array.getIndex(i);
-            switch (attrName)
-            {
+            switch (attrName) {
                 // 棋盘线颜色
                 case R.styleable.WuZiQi_panel_line_color:
                     mPaintColor = array.getInteger(attrName, 0x88000000);
@@ -135,8 +128,7 @@ public class WuZiQi extends View
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-    {
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
@@ -157,8 +149,7 @@ public class WuZiQi extends View
 
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh)
-    {
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
         mPanelWidth = w;
@@ -171,16 +162,14 @@ public class WuZiQi extends View
     }
 
     @Override
-    protected void onDraw(Canvas canvas)
-    {
+    protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         drawBoard(canvas);
         drawPiece(canvas);
         checkGameOver();
     }
 
-    private void checkGameOver()
-    {
+    private void checkGameOver() {
         boolean whiteWin = checkFiveInLine(mWhiteArray);
         boolean blackWin = checkFiveInLine(mBlackArray);
         boolean noWin = checkNoWin(whiteWin, blackWin);
@@ -192,18 +181,15 @@ public class WuZiQi extends View
         else if (noWin)
             mWin = Winner.NOWINNER;
 
-        if (whiteWin || blackWin || noWin)
-        {
+        if (whiteWin || blackWin || noWin) {
             mIsGameOver = true;
             if (mGameOverLinstener != null)
                 mGameOverLinstener.onGameOver(mWin);
         }
     }
 
-    private boolean checkFiveInLine(ArrayList<Point> points)
-    {
-        for (Point p : points)
-        {
+    private boolean checkFiveInLine(ArrayList<Point> points) {
+        for (Point p : points) {
             int x = p.x;
             int y = p.y;
 
@@ -223,11 +209,9 @@ public class WuZiQi extends View
         return false;
     }
 
-    private boolean checkHorizontal(int x, int y, ArrayList<Point> points)
-    {
+    private boolean checkHorizontal(int x, int y, ArrayList<Point> points) {
         int count = 1;
-        for (int i = 1; i < MAX_COUNT_IN_LINE; i++)
-        {
+        for (int i = 1; i < MAX_COUNT_IN_LINE; i++) {
             // 判断棋子左边是否5个相连
             if (points.contains(new Point(x - i, y)))
                 count++;
@@ -248,11 +232,9 @@ public class WuZiQi extends View
         return false;
     }
 
-    private boolean checkVertical(int x, int y, ArrayList<Point> points)
-    {
+    private boolean checkVertical(int x, int y, ArrayList<Point> points) {
         int count = 1;
-        for (int i = 1; i < MAX_COUNT_IN_LINE; i++)
-        {
+        for (int i = 1; i < MAX_COUNT_IN_LINE; i++) {
             // 判断棋子上边是否5个相连
             if (points.contains(new Point(x, y - i)))
                 count++;
@@ -274,11 +256,9 @@ public class WuZiQi extends View
         return false;
     }
 
-    private boolean checkLeftDiagonal(int x, int y, ArrayList<Point> points)
-    {
+    private boolean checkLeftDiagonal(int x, int y, ArrayList<Point> points) {
         int count = 1;
-        for (int i = 1; i < MAX_COUNT_IN_LINE; i++)
-        {
+        for (int i = 1; i < MAX_COUNT_IN_LINE; i++) {
             // 判断棋子左下边是否5个相连
             if (points.contains(new Point(x - i, y + i)))
                 count++;
@@ -300,11 +280,9 @@ public class WuZiQi extends View
         return false;
     }
 
-    private boolean checkRightDiagonal(int x, int y, ArrayList<Point> points)
-    {
+    private boolean checkRightDiagonal(int x, int y, ArrayList<Point> points) {
         int count = 1;
-        for (int i = 1; i < MAX_COUNT_IN_LINE; i++)
-        {
+        for (int i = 1; i < MAX_COUNT_IN_LINE; i++) {
             // 判断棋子右下边是否5个相连
             if (points.contains(new Point(x + i, y + i)))
                 count++;
@@ -329,33 +307,27 @@ public class WuZiQi extends View
         return false;
     }
 
-    private boolean checkNoWin(boolean whiteWin, boolean blackWin)
-    {
-        if (whiteWin || blackWin)
-        {
+    private boolean checkNoWin(boolean whiteWin, boolean blackWin) {
+        if (whiteWin || blackWin) {
             return false;
         }
         int maxPieces = MAX_LINE * MAX_LINE;
         //如果白棋和黑棋的总数等于棋盘格子数,说明和棋
-        if (mWhiteArray.size() + mBlackArray.size() == maxPieces)
-        {
+        if (mWhiteArray.size() + mBlackArray.size() == maxPieces) {
             return true;
         }
         return false;
     }
 
-    private void drawPiece(Canvas canvas)
-    {
-        for (int i = 0, n = mWhiteArray.size(); i < n; i++)
-        {
+    private void drawPiece(Canvas canvas) {
+        for (int i = 0, n = mWhiteArray.size(); i < n; i++) {
             Point whitPoint = mWhiteArray.get(i);
             float leftWhite = (whitPoint.x + (1 - ratioPieceOfLineHeight) / 2) * mLineHeight;
             float topWhite = (whitPoint.y + (1 - ratioPieceOfLineHeight) / 2) * mLineHeight;
             canvas.drawBitmap(mWhitePiece, leftWhite, topWhite, null);
         }
 
-        for (int i = 0, n = mBlackArray.size(); i < n; i++)
-        {
+        for (int i = 0, n = mBlackArray.size(); i < n; i++) {
             Point blackPoint = mBlackArray.get(i);
             float leftBlack = (blackPoint.x + (1 - ratioPieceOfLineHeight) / 2) * mLineHeight;
             float topBlack = (blackPoint.y + (1 - ratioPieceOfLineHeight) / 2) * mLineHeight;
@@ -363,13 +335,16 @@ public class WuZiQi extends View
         }
     }
 
-    private void drawBoard(Canvas canvas)
-    {
+    /**
+     * 画棋盘
+     *
+     * @param canvas 画布
+     */
+    private void drawBoard(Canvas canvas) {
         int w = mPanelWidth;
         float lineHeight = mLineHeight;
 
-        for (int i = 0; i < MAX_LINE; i++)
-        {
+        for (int i = 0; i < MAX_LINE; i++) {
             int startX = (int) (lineHeight / 2);
             int stopX = (int) (w - lineHeight / 2);
             int startY = (int) ((0.5 + i) * lineHeight);
@@ -379,13 +354,11 @@ public class WuZiQi extends View
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
+    public boolean onTouchEvent(MotionEvent event) {
         if (mIsGameOver)
             return false;
         int action = event.getAction();
-        if (action == MotionEvent.ACTION_UP)
-        {
+        if (action == MotionEvent.ACTION_UP) {
             int x = (int) event.getX();
             int y = (int) event.getY();
 
@@ -401,19 +374,57 @@ public class WuZiQi extends View
 
             invalidate();
             mIsWhite = !mIsWhite;
+            setRegretBtnEnable(true, 1.0f);
             return true;
         }
         return true;
     }
 
-    public void reStart()
-    {
+    /**
+     * 重新游戏
+     */
+    public void reStart() {
         mWhiteArray.clear();
         mBlackArray.clear();
         mIsGameOver = false;
         mIsWhite = true;
         mWin = Winner.INIT_WINNER;
         invalidate();
+        setRegretBtnEnable(true, 1.0f);
+    }
+
+    /**
+     * 悔棋->只能悔棋一次
+     */
+    public void reGret(Button btn) {
+        if (mIsWhite) {
+            if (mBlackArray.size() > 0) {
+                mBlackArray.remove(mBlackArray.size() - 1);
+                mIsWhite = false;
+                invalidate();
+            }
+        } else {
+            if (mWhiteArray.size() > 0) {
+                mWhiteArray.remove(mWhiteArray.size() - 1);
+                mIsWhite = true;
+                invalidate();
+            }
+        }
+
+        this.mRegretBtn = btn;
+        setRegretBtnEnable(false, 0.4f);
+    }
+
+    /**
+     * 设置悔棋按钮是否可用
+     * @param enable 是否可以点击
+     * @param alpha  按钮的透明度
+     */
+    private void setRegretBtnEnable(boolean enable, float alpha) {
+        if (this.mRegretBtn != null) {
+            this.mRegretBtn.setEnabled(enable);
+            this.mRegretBtn.setAlpha(alpha);
+        }
     }
 
     private static final String INSTANCE = "instance";
@@ -423,8 +434,7 @@ public class WuZiQi extends View
     private static final String INSTANCE_BLACK_ARRAY = "instance_black_array";
 
     @Override
-    protected Parcelable onSaveInstanceState()
-    {
+    protected Parcelable onSaveInstanceState() {
         Bundle bundle = new Bundle();
         bundle.putParcelable(INSTANCE, super.onSaveInstanceState());
         bundle.putBoolean(INSTANCE_GAME_OVER, mIsGameOver);
@@ -435,10 +445,8 @@ public class WuZiQi extends View
     }
 
     @Override
-    protected void onRestoreInstanceState(Parcelable state)
-    {
-        if (state instanceof Bundle)
-        {
+    protected void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
             super.onRestoreInstanceState(bundle.getParcelable(INSTANCE));
             mIsGameOver = bundle.getBoolean(INSTANCE_GAME_OVER);
@@ -448,5 +456,11 @@ public class WuZiQi extends View
             return;
         }
         super.onRestoreInstanceState(state);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        this.mRegretBtn = null;
     }
 }
