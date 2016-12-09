@@ -37,6 +37,7 @@ public class WuZiQi extends View {
     private Bitmap mBlackPiece;
 
     private Button mRegretBtn = null; // 悔棋按钮
+    private Button mIsWhiteBtn = null; // 当前行棋按钮
 
     private float ratioPieceOfLineHeight = 3 * 1.0f / 4;
 
@@ -114,6 +115,8 @@ public class WuZiQi extends View {
                     break;
             }
         }
+
+        array.recycle();
 
         mPaint = new Paint();
         mPaint.setColor(mPaintColor);
@@ -320,6 +323,7 @@ public class WuZiQi extends View {
     }
 
     private void drawPiece(Canvas canvas) {
+        updateIsWhiteBtn();
         for (int i = 0, n = mWhiteArray.size(); i < n; i++) {
             Point whitPoint = mWhiteArray.get(i);
             float leftWhite = (whitPoint.x + (1 - ratioPieceOfLineHeight) / 2) * mLineHeight;
@@ -395,29 +399,61 @@ public class WuZiQi extends View {
 
     /**
      * 悔棋->只能悔棋一次
+     *
      * @param btn 悔棋的外部按钮
      */
     public void reGret(Button btn) {
+        this.mRegretBtn = btn;
+
         if (mIsWhite) {
             if (mBlackArray.size() > 0) {
                 mBlackArray.remove(mBlackArray.size() - 1);
                 mIsWhite = false;
+                setRegretBtnEnable(false, 0.4f);
                 invalidate();
             }
         } else {
             if (mWhiteArray.size() > 0) {
                 mWhiteArray.remove(mWhiteArray.size() - 1);
                 mIsWhite = true;
+                setRegretBtnEnable(false, 0.4f);
                 invalidate();
             }
         }
+    }
 
-        this.mRegretBtn = btn;
-        setRegretBtnEnable(false, 0.4f);
+    /**
+     * 获取现在是否轮到白棋
+     *
+     * @return
+     */
+    public boolean isWhite() {
+        return mIsWhite;
+    }
+
+    /**
+     * 设置当前行棋的按钮
+     * @param btn 当前行棋的外部按钮
+     */
+    public void setIsWhite(Button btn) {
+        this.mIsWhiteBtn = btn;
+    }
+
+    /**
+     * 更新当前行棋的状态
+     */
+    private void updateIsWhiteBtn() {
+        if (this.mIsWhiteBtn != null) {
+            if (isWhite())
+                this.mIsWhiteBtn.setText(String.format(getResources().getString(R.string.isWhite), "白"));
+            else
+                this.mIsWhiteBtn.setText(String.format(getResources().getString(R.string.isWhite), "黑"));
+        }
     }
 
     /**
      * 设置悔棋按钮是否可用
+     *
      * @param enable 是否可以点击
      * @param alpha  按钮的透明度
      */
@@ -463,5 +499,6 @@ public class WuZiQi extends View {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         this.mRegretBtn = null;
+        this.mIsWhiteBtn = null;
     }
 }
