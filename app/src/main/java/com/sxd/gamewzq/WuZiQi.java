@@ -395,6 +395,7 @@ public class WuZiQi extends View {
 
     /**
      * 悔棋->只能悔棋一次
+     * @param btn 悔棋的外部按钮
      */
     public void reGret(Button btn) {
         if (mIsWhite) {
