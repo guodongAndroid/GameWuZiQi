@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">GameWZQ</string>
+    <string name="app_name">简单五子棋</string>
     <string name="isWhite">当前：%1$s棋行棋</string>
 </resources>

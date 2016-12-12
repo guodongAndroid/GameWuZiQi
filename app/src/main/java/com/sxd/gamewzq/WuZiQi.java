@@ -399,10 +399,10 @@ public class WuZiQi extends View {
 
     /**
      * 悔棋->只能悔棋一次
-     *
      * @param btn 悔棋的外部按钮
+     * @return true 悔棋成功  false 悔棋失败
      */
-    public void reGret(Button btn) {
+    public boolean reGret(Button btn) {
         this.mRegretBtn = btn;
 
         if (mIsWhite) {
@@ -411,6 +411,7 @@ public class WuZiQi extends View {
                 mIsWhite = false;
                 setRegretBtnEnable(false, 0.4f);
                 invalidate();
+                return true;
             }
         } else {
             if (mWhiteArray.size() > 0) {
@@ -418,8 +419,11 @@ public class WuZiQi extends View {
                 mIsWhite = true;
                 setRegretBtnEnable(false, 0.4f);
                 invalidate();
+                return true;
             }
         }
+
+        return false;
     }
 
     /**

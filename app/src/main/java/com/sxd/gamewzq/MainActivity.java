@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -19,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
     private WuZiQi mWQZ;
     private Button mRegret;
     private Button mGiveUp;
-    private Button mIsWhiteBtn;
 
     private static final String PACKAGE_NAME = "com.guodong.sun.guodong";
 
@@ -34,48 +35,44 @@ public class MainActivity extends AppCompatActivity {
 
         mWQZ.setIsWhite((Button) findViewById(R.id.isWhite));
 
-        mRegret.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mWQZ.reGret(mRegret);
+        mRegret.setOnClickListener(v -> {
+            if (mWQZ.reGret(mRegret)) {
+                Toast.makeText(MainActivity.this, "对方同意悔棋", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "对方不同意悔棋", Toast.LENGTH_SHORT).show();
+            }
 //                startGuodong(PACKAGE_NAME);
-            }
         });
 
-        mGiveUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mWQZ.isWhite())
-                    showDialog("黑棋胜利");
-                else
+        mGiveUp.setOnClickListener(v -> {
+            if (mWQZ.isWhite())
+                showDialog("黑棋胜利");
+            else
+                showDialog("白棋胜利");
+        });
+
+        mWQZ.setOnGameOverLinstener(win -> {
+            switch (win) {
+                case WHITEWINNER:
                     showDialog("白棋胜利");
-            }
-        });
+                    break;
 
-        mWQZ.setOnGameOverLinstener(new WuZiQi.GameOverLinstener() {
-            @Override
-            public void onGameOver(WuZiQi.Winner win) {
-                switch (win) {
-                    case WHITEWINNER:
-                        showDialog("白棋胜利");
-                        break;
+                case BLACKWINNER:
+                    showDialog("黑棋胜利");
+                    break;
 
-                    case BLACKWINNER:
-                        showDialog("黑棋胜利");
-                        break;
-
-                    case NOWINNER:
-                        showDialog("和棋");
-                        break;
-                    default:
-                        break;
-                }
+                case NOWINNER:
+                    showDialog("和棋");
+                    break;
+                default:
+                    break;
             }
         });
     }
 
     /**
      * 启动其他的App
+     *
      * @param packageName 其他App的包名
      */
     private void startGuodong(String packageName) {
@@ -96,16 +93,9 @@ public class MainActivity extends AppCompatActivity {
     private void showDialog(String text) {
         new AlertDialog.Builder(MainActivity.this).setMessage(text)
                 .setCancelable(false)
-                .setPositiveButton("再来一局", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mWQZ.reStart();
-                    }
-                }).setNegativeButton("退出游戏", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-            }
-        }).create().show();
+                .setPositiveButton("再来一局", (dialog, which) -> mWQZ.reStart())
+                .setNegativeButton("退出游戏", ((dialog, which) -> finish()))
+                .create()
+                .show();
     }
 }

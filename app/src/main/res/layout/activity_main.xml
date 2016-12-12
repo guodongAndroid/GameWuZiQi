@@ -11,49 +11,55 @@
         android:layout_height="match_parent"
         android:text="Hello World!"/>
 
-    <Button
-        android:id="@+id/regret"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="10dp"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/wuqizi"
-        android:textColor="@android:color/white"
-        android:background="@android:color/holo_red_dark"
-        android:text="悔棋"/>
+        android:layout_below="@id/wuqizi">
 
-    <Button
-        android:id="@+id/giveUp"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/wuqizi"
-        android:textColor="@android:color/white"
-        android:background="@android:color/holo_red_dark"
-        android:text="认输"/>
+        <Button
+            android:id="@+id/regret"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:background="@color/colorPrimary"
+            android:text="悔棋"/>
 
-    <Button
-        android:id="@+id/isWhite"
-        android:layout_centerInParent="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/wuqizi"
-        android:gravity="center"
-        android:padding="10dp"
-        android:textColor="@android:color/black"
-        android:textSize="18sp"
-        android:background="@color/yellow1"
-        android:text="@string/isWhite"/>
+        <Button
+            android:id="@+id/giveUp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:background="@color/colorPrimary"
+            android:text="认输"/>
+
+        <Button
+            android:id="@+id/isWhite"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:background="@color/colorPrimary"
+            android:text="@string/isWhite"/>
+
+    </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:gravity="center"
-        android:background="@color/yellow"
-        android:textColor="@android:color/black"
+        android:background="@color/colorPrimary"
+        android:textColor="@android:color/white"
         android:textSize="18sp"
         android:text="Tips:默认白棋先手"/>
 
