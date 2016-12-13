@@ -1,15 +1,18 @@
 package com.sxd.gamewzq;
 
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+
+import static com.sxd.gamewzq.WuZiQi.Winner.BLACKWINNER;
+import static com.sxd.gamewzq.WuZiQi.Winner.NOWINNER;
+import static com.sxd.gamewzq.WuZiQi.Winner.WHITEWINNER;
 
 /**
  * 作者：Sun
@@ -21,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private WuZiQi mWQZ;
     private Button mRegret;
     private Button mGiveUp;
+    private Button mIsWhiteBtn;
 
     private static final String PACKAGE_NAME = "com.guodong.sun.guodong";
 
@@ -32,17 +36,9 @@ public class MainActivity extends AppCompatActivity {
         mWQZ = (WuZiQi) findViewById(R.id.wuqizi);
         mRegret = (Button) findViewById(R.id.regret);
         mGiveUp = (Button) findViewById(R.id.giveUp);
+        mIsWhiteBtn = (Button) findViewById(R.id.isWhite);
 
-        mWQZ.setIsWhite((Button) findViewById(R.id.isWhite));
-
-        mRegret.setOnClickListener(v -> {
-            if (mWQZ.reGret(mRegret)) {
-                Toast.makeText(MainActivity.this, "对方同意悔棋", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(MainActivity.this, "对方不同意悔棋", Toast.LENGTH_SHORT).show();
-            }
-//                startGuodong(PACKAGE_NAME);
-        });
+        setRegretBtnEnable(false, 0.4f);
 
         mGiveUp.setOnClickListener(v -> {
             if (mWQZ.isWhite())
@@ -51,21 +47,53 @@ public class MainActivity extends AppCompatActivity {
                 showDialog("白棋胜利");
         });
 
-        mWQZ.setOnGameOverLinstener(win -> {
-            switch (win) {
-                case WHITEWINNER:
-                    showDialog("白棋胜利");
-                    break;
+        mWQZ.setOnGameLinstener(new WuZiQi.OnGameLinstener() {
+            @Override
+            public void onGameOver(WuZiQi.Winner win) {
+                switch (win) {
+                    case WHITEWINNER:
+                        showDialog("白棋胜利");
+                        break;
 
-                case BLACKWINNER:
-                    showDialog("黑棋胜利");
-                    break;
+                    case BLACKWINNER:
+                        showDialog("黑棋胜利");
+                        break;
 
-                case NOWINNER:
-                    showDialog("和棋");
-                    break;
-                default:
-                    break;
+                    case NOWINNER:
+                        showDialog("和棋");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void onRegret(boolean isWhite, ArrayList<Point> whiteArray, ArrayList<Point> blackArray) {
+                mRegret.setOnClickListener(v -> {
+                    if (isWhite) {
+                        if (blackArray.size() > 0) {
+                            blackArray.remove(blackArray.size() - 1);
+                            mWQZ.setIsWhite(false);
+                            mWQZ.invalidate();
+                        }
+                    } else {
+                        if (whiteArray.size() > 0) {
+                            whiteArray.remove(whiteArray.size() - 1);
+                            mWQZ.setIsWhite(true);
+                            mWQZ.invalidate();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void updateIsWhite(String isWhite) {
+                mIsWhiteBtn.setText(String.format(getResources().getString(R.string.isWhite), isWhite));
+            }
+
+            @Override
+            public void updateRegretBtnEnable(boolean enable, float alpha) {
+                setRegretBtnEnable(enable, alpha);
             }
         });
     }
@@ -97,5 +125,18 @@ public class MainActivity extends AppCompatActivity {
                 .setNegativeButton("退出游戏", ((dialog, which) -> finish()))
                 .create()
                 .show();
+    }
+
+    /**
+     * 设置悔棋按钮是否可用
+     *
+     * @param enable 是否可以点击
+     * @param alpha  按钮的透明度
+     */
+    private void setRegretBtnEnable(boolean enable, float alpha) {
+        if (this.mRegret != null) {
+            this.mRegret.setEnabled(enable);
+            this.mRegret.setAlpha(alpha);
+        }
     }
 }

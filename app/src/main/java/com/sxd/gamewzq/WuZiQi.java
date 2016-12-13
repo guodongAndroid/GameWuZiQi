@@ -45,8 +45,8 @@ public class WuZiQi extends View {
      * 白棋先手，或当前轮到白棋
      */
     private boolean mIsWhite = true;
-    private ArrayList<Point> mWhiteArray = new ArrayList<>();
-    private ArrayList<Point> mBlackArray = new ArrayList<>();
+    private ArrayList<Point> mWhiteArray = new MyArrayList<>();
+    private ArrayList<Point> mBlackArray = new MyArrayList<>();
 
     private boolean mIsGameOver;
 
@@ -57,19 +57,44 @@ public class WuZiQi extends View {
         NOWINNER
     }
 
-    public interface GameOverLinstener {
+    public interface OnGameLinstener {
         /**
          * @param win win == true, 白棋胜, 反之则，黑棋胜
          */
         void onGameOver(Winner win);
+
+        /**
+         * 回调悔棋
+         *
+         * @param isWhite    是否轮到白棋
+         * @param whiteArray 白棋集合
+         * @param blackArray 黑棋集合
+         */
+        void onRegret(boolean isWhite, ArrayList<Point> whiteArray, ArrayList<Point> blackArray);
+
+        /**
+         * 回调当前行棋者
+         *
+         * @param isWhite
+         */
+        void updateIsWhite(String isWhite);
+
+        /**
+         * 回调悔棋按钮的状态
+         *
+         * @param enable
+         */
+        void updateRegretBtnEnable(boolean enable, float alpha);
     }
 
     private Winner mWin = Winner.INIT_WINNER;
 
-    private GameOverLinstener mGameOverLinstener;
+    private OnGameLinstener mGameLinstener;
 
-    public void setOnGameOverLinstener(GameOverLinstener linstener) {
-        this.mGameOverLinstener = linstener;
+    public void setOnGameLinstener(OnGameLinstener linstener) {
+        this.mGameLinstener = linstener;
+        ((MyArrayList) mWhiteArray).setOnGameLinstener(mGameLinstener);
+        ((MyArrayList) mBlackArray).setOnGameLinstener(mGameLinstener);
     }
 
     public WuZiQi(Context context) {
@@ -186,8 +211,8 @@ public class WuZiQi extends View {
 
         if (whiteWin || blackWin || noWin) {
             mIsGameOver = true;
-            if (mGameOverLinstener != null)
-                mGameOverLinstener.onGameOver(mWin);
+            if (mGameLinstener != null)
+                mGameLinstener.onGameOver(mWin);
         }
     }
 
@@ -323,7 +348,7 @@ public class WuZiQi extends View {
     }
 
     private void drawPiece(Canvas canvas) {
-        updateIsWhiteBtn();
+//        updateIsWhiteBtn();
         for (int i = 0, n = mWhiteArray.size(); i < n; i++) {
             Point whitPoint = mWhiteArray.get(i);
             float leftWhite = (whitPoint.x + (1 - ratioPieceOfLineHeight) / 2) * mLineHeight;
@@ -336,6 +361,14 @@ public class WuZiQi extends View {
             float leftBlack = (blackPoint.x + (1 - ratioPieceOfLineHeight) / 2) * mLineHeight;
             float topBlack = (blackPoint.y + (1 - ratioPieceOfLineHeight) / 2) * mLineHeight;
             canvas.drawBitmap(mBlackPiece, leftBlack, topBlack, null);
+        }
+
+        if (mGameLinstener != null) {
+            mGameLinstener.onRegret(mIsWhite, mWhiteArray, mBlackArray);
+            if (isWhite())
+                mGameLinstener.updateIsWhite("白");
+            else
+                mGameLinstener.updateIsWhite("黑");
         }
     }
 
@@ -378,7 +411,9 @@ public class WuZiQi extends View {
 
             invalidate();
             mIsWhite = !mIsWhite;
-            setRegretBtnEnable(true, 1.0f);
+            if (mGameLinstener != null) {
+                mGameLinstener.updateRegretBtnEnable(true, 1.0f);
+            }
             return true;
         }
         return true;
@@ -394,36 +429,9 @@ public class WuZiQi extends View {
         mIsWhite = true;
         mWin = Winner.INIT_WINNER;
         invalidate();
-        setRegretBtnEnable(true, 1.0f);
-    }
-
-    /**
-     * 悔棋->只能悔棋一次
-     * @param btn 悔棋的外部按钮
-     * @return true 悔棋成功  false 悔棋失败
-     */
-    public boolean reGret(Button btn) {
-        this.mRegretBtn = btn;
-
-        if (mIsWhite) {
-            if (mBlackArray.size() > 0) {
-                mBlackArray.remove(mBlackArray.size() - 1);
-                mIsWhite = false;
-                setRegretBtnEnable(false, 0.4f);
-                invalidate();
-                return true;
-            }
-        } else {
-            if (mWhiteArray.size() > 0) {
-                mWhiteArray.remove(mWhiteArray.size() - 1);
-                mIsWhite = true;
-                setRegretBtnEnable(false, 0.4f);
-                invalidate();
-                return true;
-            }
+        if (mGameLinstener != null) {
+            mGameLinstener.updateRegretBtnEnable(true, 1.0f);
         }
-
-        return false;
     }
 
     /**
@@ -436,36 +444,12 @@ public class WuZiQi extends View {
     }
 
     /**
-     * 设置当前行棋的按钮
-     * @param btn 当前行棋的外部按钮
-     */
-    public void setIsWhite(Button btn) {
-        this.mIsWhiteBtn = btn;
-    }
-
-    /**
-     * 更新当前行棋的状态
-     */
-    private void updateIsWhiteBtn() {
-        if (this.mIsWhiteBtn != null) {
-            if (isWhite())
-                this.mIsWhiteBtn.setText(String.format(getResources().getString(R.string.isWhite), "白"));
-            else
-                this.mIsWhiteBtn.setText(String.format(getResources().getString(R.string.isWhite), "黑"));
-        }
-    }
-
-    /**
-     * 设置悔棋按钮是否可用
+     * 设置当前是否轮到白棋
      *
-     * @param enable 是否可以点击
-     * @param alpha  按钮的透明度
+     * @param isWhite 是否轮到白棋
      */
-    private void setRegretBtnEnable(boolean enable, float alpha) {
-        if (this.mRegretBtn != null) {
-            this.mRegretBtn.setEnabled(enable);
-            this.mRegretBtn.setAlpha(alpha);
-        }
+    public void setIsWhite(boolean isWhite) {
+        this.mIsWhite = isWhite;
     }
 
     private static final String INSTANCE = "instance";
