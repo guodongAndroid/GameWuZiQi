@@ -348,7 +348,6 @@ public class WuZiQi extends View {
     }
 
     private void drawPiece(Canvas canvas) {
-//        updateIsWhiteBtn();
         for (int i = 0, n = mWhiteArray.size(); i < n; i++) {
             Point whitPoint = mWhiteArray.get(i);
             float leftWhite = (whitPoint.x + (1 - ratioPieceOfLineHeight) / 2) * mLineHeight;
