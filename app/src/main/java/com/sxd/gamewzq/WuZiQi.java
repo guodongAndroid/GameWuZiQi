@@ -36,9 +36,6 @@ public class WuZiQi extends View {
     private Bitmap mWhitePiece;
     private Bitmap mBlackPiece;
 
-    private Button mRegretBtn = null; // 悔棋按钮
-    private Button mIsWhiteBtn = null; // 当前行棋按钮
-
     private float ratioPieceOfLineHeight = 3 * 1.0f / 4;
 
     /**
@@ -480,12 +477,5 @@ public class WuZiQi extends View {
             return;
         }
         super.onRestoreInstanceState(state);
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        this.mRegretBtn = null;
-        this.mIsWhiteBtn = null;
     }
 }
